@@ -4,7 +4,7 @@ import * as fs from "fs"
 
 export function initializeFirebase(): App {
 	// Option A: Local serviceAccountKey.json file
-	const serviceAccountPath = path.join(__dirname, "..", "serviceAccountKey.json")
+	const serviceAccountPath = path.join(__dirname, "../../serviceAccountKey.json")
 
 	if (fs.existsSync(serviceAccountPath)) {
 		return initializeApp({
