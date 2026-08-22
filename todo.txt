@@ -1,0 +1,17 @@
+# Actions for MEMBER
+   - Create risk "Risk Kaydı Oluştur"
+   - Get all risks that created by the user like "Risklerim"
+   
+# Actions for ADMIN extends MEMBER
+   - Get all risk by the status of the risk like if "Riskler > New" etc.
+   # Spesific to admin
+      - admin can assign risk to a user like "Risk Atama"
+         - Risks > New > Selectes Risk > Assign to User (selectes user, add description, add deadline)
+      - admin can confirm the risk is completed like from "pending" to "completed" status
+
+# Actions for STAFF
+   - Get all risk by the status of the risk like if "Riskler > New" etc.
+   # Spesific to staff
+      - staff can confirm the risk is completed like from "inprogress" to "pending" status
+      - Gets risk with status of "inprogress" but it has to be assigned to the staff user. 
+         - selects the risk > add description > add image > change status to "pending"
