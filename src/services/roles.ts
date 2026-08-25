@@ -1,0 +1,35 @@
+export const ACTIONS: Record<RoleAction, ActionDef> = {
+	addRisk: { key: "addRisk", label: "Risk Ekle", implemented: true },
+	myRisks: { key: "myRisks", label: "Risklerim", implemented: false },
+	allRisks: { key: "allRisks", label: "Tüm Riskler", implemented: false },
+	assignRisk: { key: "assignRisk", label: "Risk Atama", implemented: false },
+	completeRisk: { key: "completeRisk", label: "Risk Durumu Güncelle", implemented: false },
+}
+
+const ROLE_ACTIONS: Record<AuthUser["role"], RoleAction[]> = {
+	MEMBER: ["addRisk", "myRisks"],
+	STAFF: ["addRisk", "myRisks", "allRisks", "completeRisk"],
+	ADMIN: ["addRisk", "myRisks", "allRisks", "assignRisk", "completeRisk"],
+}
+
+export function allowedActions(role: AuthUser["role"]): ActionDef[] {
+	return (ROLE_ACTIONS[role] || [])
+		.map((key) => ACTIONS[key])
+		.filter((action): action is ActionDef => action.implemented)
+}
+
+export function buildMenu(role: AuthUser["role"]): string {
+	const actions = allowedActions(role)
+	if (actions.length === 0) {
+		return "Şu an için sizin için uygun bir işlem bulunmuyor. Yakında eklenecektir."
+	}
+	const lines = actions.map((action, i) => `${i + 1} - ${action.label}`)
+	return `İşlem seçiniz:\n${lines.join("\n")}`
+}
+
+export function matchSelection(role: AuthUser["role"], text: string): RoleAction | undefined {
+	const actions = allowedActions(role)
+	const index = parseInt(text, 10) - 1
+	if (Number.isNaN(index) || index < 0 || index >= actions.length) return undefined
+	return actions[index].key
+}

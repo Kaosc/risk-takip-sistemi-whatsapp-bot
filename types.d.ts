@@ -44,21 +44,50 @@ interface Risk {
 	completionNotes?: string // Yapılan işlemlerle ilgili notlar
 }
 
-declare module "qrcode-terminal" {
-  interface GenerateOptions {
-    small?: boolean;
-  }
-  function generate(text: string, options?: GenerateOptions): void;
-  export { generate };
+interface AuthUser {
+	uid: string
+	name: string
+	email?: string
+	role: "ADMIN" | "STAFF" | "MEMBER"
+	phoneNumber?: string
 }
 
-type SessionStep = "type" | "category" | "location" | "description"
+interface SessionContext {
+	message: import("whatsapp-web.js").Message
+	user: AuthUser
+}
+
+type SessionOutcome = "handled" | "completed" | "cancelled"
 
 interface Session {
-	step: SessionStep
-	data: {
-		type?: string
-		category?: string
-		location?: string
+	readonly kind: string
+	starter(): string
+	handle(ctx: SessionContext): Promise<SessionOutcome>
+}
+
+type RoleAction = "addRisk" | "myRisks" | "allRisks" | "assignRisk" | "completeRisk"
+
+interface ActionDef {
+	key: RoleAction
+	label: string
+	implemented: boolean
+}
+
+type RiskStep = "type" | "category" | "location" | "severity" | "description" | "images" | "done"
+
+interface RiskDraft {
+	type?: string
+	category?: string
+	location?: string
+	severity?: string
+	description?: string
+	images?: { data: string; mimetype: string }[]
+}
+
+declare module "qrcode-terminal" {
+	interface GenerateOptions {
+		small?: boolean
 	}
+	function generate(text: string, options?: GenerateOptions): void
+	export { generate }
 }
