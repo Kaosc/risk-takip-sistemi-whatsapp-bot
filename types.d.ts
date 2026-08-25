@@ -60,8 +60,7 @@ interface SessionContext {
 type SessionOutcome = "handled" | "completed" | "cancelled"
 
 interface Session {
-	readonly kind: string
-	starter(): string
+	start(): string
 	handle(ctx: SessionContext): Promise<SessionOutcome>
 }
 

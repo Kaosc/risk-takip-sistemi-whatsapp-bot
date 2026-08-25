@@ -1,7 +1,7 @@
 import { Message } from "whatsapp-web.js"
 
 import { buildMenu, matchSelection } from "./services/roles"
-import { AddRiskSession } from "./sessions/addRisk"
+import { createAddRiskSession } from "./sessions/addRisk"
 
 import { getUserByPhone } from "./firebase/users"
 import { getApp } from "./firebase/index"
@@ -43,7 +43,10 @@ export async function handleMessage(message: Message): Promise<void> {
 
 	const phone = extractPhone(message)
 	const text = message.body.trim()
-	if (!text) return
+
+	// When user sends an empty message (e.g., just media), we ignore it
+	// Like if the user sends only an image without any caption, we don't want to process it as a command
+	if (!text && !message.hasMedia) return
 
 	// Cancel command: "!iptal"
 	if (isCancelCommand(text)) {
@@ -66,7 +69,7 @@ export async function handleMessage(message: Message): Promise<void> {
 	const active = activeSessions.get(phone)
 	if (active) {
 		const outcome = await active.handle({ message, user })
-		if (outcome !== ("handled" as SessionOutcome)) {
+		if (outcome !== "handled") {
 			clearActiveSession(phone)
 		}
 		return
@@ -90,24 +93,20 @@ export async function handleMessage(message: Message): Promise<void> {
 }
 
 /** Seçilen eyleme göre ilgili oturumu başlatır. */
-async function startAction(
-	action: RoleAction,
-	phone: string,
-	message: Message,
-	user: AuthUser,
-): Promise<void> {
+async function startAction(action: RoleAction, phone: string, message: Message, user: AuthUser): Promise<void> {
 	switch (action) {
 		case "addRisk": {
-			const session = new AddRiskSession()
+			const session = createAddRiskSession()
 			activeSessions.set(phone, session)
-			await message.reply(session.starter())
+			await message.reply(session.start())
 			return
 		}
 
+		//
 		// Other action will be added later on in this block
+		//
 		default:
 			await message.reply(buildMenu(user.role))
 			return
 	}
 }
-
