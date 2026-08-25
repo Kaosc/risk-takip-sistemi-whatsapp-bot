@@ -11,14 +11,14 @@ const risksCollection = db.collection("risks")
 
 const sessions = new Map<string, Session>()
 
-function getSenderId(message: Message): string {
+function getsenderPhone(message: Message): string {
 	// whatsapp-web.js: message.from is the chat id (e.g. "905551234567@c.us")
 	// We strip the "@c.us" suffix to get the raw phone number.
 	return message.from.split("@")[0]
 }
 
-function clearSession(senderId: string): void {
-	sessions.delete(senderId)
+function clearSession(senderPhone: string): void {
+	sessions.delete(senderPhone)
 }
 
 function isCancelCommand(text: string): boolean {
@@ -32,13 +32,13 @@ function isStartCommand(text: string): boolean {
 }
 
 export async function handleMessage(message: Message): Promise<void> {
-	const senderId = getSenderId(message)
+	const senderPhone = getsenderPhone(message)
 	const text = message.body.trim()
 
 	// --- Cancel command at any step ---
 	if (isCancelCommand(text)) {
-		if (sessions.has(senderId)) {
-			clearSession(senderId)
+		if (sessions.has(senderPhone)) {
+			clearSession(senderPhone)
 			await message.reply("❌ Bildirim işlemi iptal edildi.")
 		} else {
 			await message.reply("Aktif bir bildirim işleminiz bulunmuyor.")
@@ -48,13 +48,13 @@ export async function handleMessage(message: Message): Promise<void> {
 
 	// --- Start command ---
 	if (isStartCommand(text)) {
-		sessions.set(senderId, { step: "type", data: {} })
+		sessions.set(senderPhone, { step: "type", data: {} })
 		await message.reply("Bildirim Türü Seçiniz:\n\n1. Risk Bildirimi\n2. İş Kazası\n3. Ramak Kala")
 		return
 	}
 
 	// --- If no active session, ignore ---
-	const session = sessions.get(senderId)
+	const session = sessions.get(senderPhone)
 	if (!session) {
 		return
 	}
@@ -115,7 +115,7 @@ export async function handleMessage(message: Message): Promise<void> {
 			}
 
 			// Clear the user's session state
-			clearSession(senderId)
+			clearSession(senderPhone)
 			return
 		}
 	}
