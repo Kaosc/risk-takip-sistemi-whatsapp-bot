@@ -30,7 +30,7 @@ function isCancelCommand(text: string): boolean {
 
 function isMenuCommand(text: string): boolean {
 	const normalized = text.toLowerCase()
-	return normalized === "menu" || normalized === "menü"
+	return normalized === "menu" || normalized === "menü" || normalized === "risk"
 }
 
 function clearActiveSession(phone: string): void {
@@ -89,7 +89,8 @@ export async function handleMessage(message: Message): Promise<void> {
 	}
 
 	// If none of the above, show the menu again
-	await message.reply(buildMenu(user.role))
+	// await message.reply(buildMenu(user.role))
+	return
 }
 
 /** Seçilen eyleme göre ilgili oturumu başlatır. */

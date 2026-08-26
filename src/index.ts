@@ -47,8 +47,8 @@ client.on("ready", () => {
 })
 
 client.on("message_create", async (message) => {
-	// Only handle messages you sent to yourself
-	const isSelfChat = message.from === client.info.wid._serialized
+	// !! HARD CODE ID OF THE CHAT AND SENDER ID OTHER WISE IT WILL AUTO RESPOND TO ALL AVAILABLE CHATS 
+	const isSelfChat = message.from === process.env.MESSAGE_FROM && message.to === process.env.MESSAGE_TO
 	if (!message.fromMe || !isSelfChat) return
 
 	try {
