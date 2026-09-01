@@ -2,6 +2,7 @@ import { Message, MessageMedia } from "whatsapp-web.js"
 import { FieldValue, Timestamp } from "firebase-admin/firestore"
 
 import { getDb } from "../firebase/index"
+import { formatDate, parseDueDate } from "../lib/date"
 
 type AssignRiskStep = "selectStaff" | "taskDescription" | "dueDate" | "done"
 
@@ -41,27 +42,7 @@ function buildStaffList(staff: User[]): string {
 	return staff.map((s, i) => `${i + 1} - ${s.name}`).join("\n")
 }
 
-/** "Gün-Ay-Yıl" (örn: 10-06-2024) formatını tarihe çevirir; geçersizse null. */
-function parseDueDate(text: string): Date | null {
-	const match = /^(\d{1,2})-(\d{1,2})-(\d{4})$/.exec(text.trim())
-	if (!match) return null
-	const day = parseInt(match[1], 10)
-	const month = parseInt(match[2], 10)
-	const year = parseInt(match[3], 10)
-	const date = new Date(year, month - 1, day)
-	// 32-13-2024 gibi geçersiz kaymaları reddet
-	if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return null
-	return date
-}
-
-/** DD-MM-YYYY ---> "YYYY-MM-DD" */
-function formatDate(date: Date): string {
-	const day = String(date.getDate()).padStart(2, "0")
-	const month = String(date.getMonth() + 1).padStart(2, "0")
-	return `${date.getFullYear()}-${month}-${day}`
-}
-
-export function createAssignRiskSession(): Session & { active: boolean } {
+export function createAssignRiskSession(): Session {
 	let currentStep: AssignRiskStep = "done"
 	let aborted = false
 	let currentRisk: (Risk & { id: string }) | null = null
@@ -110,10 +91,6 @@ export function createAssignRiskSession(): Session & { active: boolean } {
 	}
 
 	return {
-		get active(): boolean {
-			return !aborted
-		},
-
 		async start(message: Message): Promise<string> {
 			currentRisk = await fetchRandomNewRisk()
 			if (!currentRisk) {

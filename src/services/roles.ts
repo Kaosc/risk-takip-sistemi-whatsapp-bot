@@ -1,13 +1,14 @@
 export const ACTIONS: Record<RoleAction, ActionDef> = {
 	addRisk: { key: "addRisk", label: "Risk Ekle", implemented: true },
 	assignRisk: { key: "assignRisk", label: "Risk Atama", implemented: true },
-	completeRisk: { key: "completeRisk", label: "Risk Durumu Güncelle", implemented: false },
+	confirmRisk: { key: "confirmRisk", label: "Risk Onayla", implemented: true },
+	completeRisk: { key: "completeRisk", label: "Görev Tamamla", implemented: false },
 }
 
 const ROLE_ACTIONS: Record<AuthUser["role"], RoleAction[]> = {
 	MEMBER: ["addRisk"],
 	STAFF: ["addRisk", "completeRisk"],
-	ADMIN: ["addRisk", "assignRisk", "completeRisk"],
+	ADMIN: ["addRisk", "assignRisk", "confirmRisk", "completeRisk"],
 }
 
 export function allowedActions(role: AuthUser["role"]): ActionDef[] {

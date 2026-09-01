@@ -3,6 +3,7 @@ import { Message } from "whatsapp-web.js"
 import { buildMenu, matchSelection } from "./services/roles"
 import { createAddRiskSession } from "./sessions/addRisk"
 import { createAssignRiskSession } from "./sessions/assignRisk"
+import { createConfirmRiskSession } from "./sessions/confirmRisk"
 
 import { getUserByPhone } from "./firebase/users"
 import { getApp } from "./firebase/index"
@@ -109,6 +110,13 @@ async function startAction(action: RoleAction, phone: string, message: Message, 
 
 		case "assignRisk": {
 			const session = createAssignRiskSession()
+			activeSessions.set(phone, session)
+			await message.reply(await session.start(message))
+			return
+		}
+
+		case "confirmRisk": {
+			const session = createConfirmRiskSession()
 			activeSessions.set(phone, session)
 			await message.reply(await session.start(message))
 			return

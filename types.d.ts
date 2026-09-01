@@ -64,7 +64,7 @@ interface Session {
 	handle(ctx: SessionContext): Promise<SessionOutcome>
 }
 
-type RoleAction = "addRisk" | "assignRisk" | "completeRisk"
+type RoleAction = "addRisk" | "assignRisk" | "confirmRisk" | "completeRisk"
 
 interface ActionDef {
 	key: RoleAction
