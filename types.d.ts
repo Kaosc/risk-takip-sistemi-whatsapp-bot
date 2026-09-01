@@ -60,11 +60,11 @@ interface SessionContext {
 type SessionOutcome = "handled" | "completed" | "cancelled"
 
 interface Session {
-	start(): string
+	start(message: import("whatsapp-web.js").Message): string | Promise<string>
 	handle(ctx: SessionContext): Promise<SessionOutcome>
 }
 
-type RoleAction = "addRisk" | "myRisks" | "allRisks" | "assignRisk" | "completeRisk"
+type RoleAction = "addRisk" | "assignRisk" | "completeRisk"
 
 interface ActionDef {
 	key: RoleAction

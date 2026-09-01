@@ -1,21 +1,17 @@
 export const ACTIONS: Record<RoleAction, ActionDef> = {
 	addRisk: { key: "addRisk", label: "Risk Ekle", implemented: true },
-	myRisks: { key: "myRisks", label: "Risklerim", implemented: false },
-	allRisks: { key: "allRisks", label: "Tüm Riskler", implemented: false },
-	assignRisk: { key: "assignRisk", label: "Risk Atama", implemented: false },
+	assignRisk: { key: "assignRisk", label: "Risk Atama", implemented: true },
 	completeRisk: { key: "completeRisk", label: "Risk Durumu Güncelle", implemented: false },
 }
 
 const ROLE_ACTIONS: Record<AuthUser["role"], RoleAction[]> = {
-	MEMBER: ["addRisk", "myRisks"],
-	STAFF: ["addRisk", "myRisks", "allRisks", "completeRisk"],
-	ADMIN: ["addRisk", "myRisks", "allRisks", "assignRisk", "completeRisk"],
+	MEMBER: ["addRisk"],
+	STAFF: ["addRisk", "completeRisk"],
+	ADMIN: ["addRisk", "assignRisk", "completeRisk"],
 }
 
 export function allowedActions(role: AuthUser["role"]): ActionDef[] {
-	return (ROLE_ACTIONS[role] || [])
-		.map((key) => ACTIONS[key])
-		.filter((action): action is ActionDef => action.implemented)
+	return (ROLE_ACTIONS[role] || []).map((key) => ACTIONS[key]).filter((action): action is ActionDef => action.implemented)
 }
 
 export function buildMenu(role: AuthUser["role"]): string {

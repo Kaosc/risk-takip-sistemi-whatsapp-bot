@@ -2,6 +2,7 @@ import { Message } from "whatsapp-web.js"
 
 import { buildMenu, matchSelection } from "./services/roles"
 import { createAddRiskSession } from "./sessions/addRisk"
+import { createAssignRiskSession } from "./sessions/assignRisk"
 
 import { getUserByPhone } from "./firebase/users"
 import { getApp } from "./firebase/index"
@@ -67,15 +68,18 @@ export async function handleMessage(message: Message): Promise<void> {
 
 	// If there is an active session for this user, delegate the message to it
 	const active = activeSessions.get(phone)
+
 	if (active) {
 		const outcome = await active.handle({ message, user })
+
 		if (outcome !== "handled") {
 			clearActiveSession(phone)
 		}
+
 		return
 	}
 
-	// Menu command: "menu" or "menü"
+	// Menu command: "menu" | "menü" | "risk" 
 	if (isMenuCommand(text)) {
 		await message.reply(buildMenu(user.role))
 		return
@@ -99,7 +103,14 @@ async function startAction(action: RoleAction, phone: string, message: Message, 
 		case "addRisk": {
 			const session = createAddRiskSession()
 			activeSessions.set(phone, session)
-			await message.reply(session.start())
+			await message.reply(await session.start(message))
+			return
+		}
+
+		case "assignRisk": {
+			const session = createAssignRiskSession()
+			activeSessions.set(phone, session)
+			await message.reply(await session.start(message))
 			return
 		}
 
