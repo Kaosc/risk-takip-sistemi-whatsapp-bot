@@ -4,6 +4,7 @@ import { buildMenu, matchSelection } from "./services/roles"
 import { createAddRiskSession } from "./sessions/addRisk"
 import { createAssignRiskSession } from "./sessions/assignRisk"
 import { createConfirmRiskSession } from "./sessions/confirmRisk"
+import { createCompleteRiskSession } from "./sessions/completeRisk"
 
 import { getUserByPhone } from "./firebase/users"
 import { getApp } from "./firebase/index"
@@ -73,6 +74,7 @@ export async function handleMessage(message: Message): Promise<void> {
 	if (active) {
 		const outcome = await active.handle({ message, user })
 
+		// Session completed or cancelled, remove it from active sessions
 		if (outcome !== "handled") {
 			clearActiveSession(phone)
 		}
@@ -80,7 +82,7 @@ export async function handleMessage(message: Message): Promise<void> {
 		return
 	}
 
-	// Menu command: "menu" | "menü" | "risk" 
+	// Menu command: "menu" | "menü" | "risk"
 	if (isMenuCommand(text)) {
 		await message.reply(buildMenu(user.role))
 		return
@@ -98,7 +100,6 @@ export async function handleMessage(message: Message): Promise<void> {
 	return
 }
 
-/** Seçilen eyleme göre ilgili oturumu başlatır. */
 async function startAction(action: RoleAction, phone: string, message: Message, user: AuthUser): Promise<void> {
 	switch (action) {
 		case "addRisk": {
@@ -122,9 +123,12 @@ async function startAction(action: RoleAction, phone: string, message: Message, 
 			return
 		}
 
-		//
-		// Other action will be added later on in this block
-		//
+		case "completeRisk": {
+			const session = createCompleteRiskSession()
+			activeSessions.set(phone, session)
+			await message.reply(await session.start(message))
+			return
+		}
 		default:
 			await message.reply(buildMenu(user.role))
 			return

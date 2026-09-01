@@ -2,7 +2,7 @@ export const ACTIONS: Record<RoleAction, ActionDef> = {
 	addRisk: { key: "addRisk", label: "Risk Ekle", implemented: true },
 	assignRisk: { key: "assignRisk", label: "Risk Atama", implemented: true },
 	confirmRisk: { key: "confirmRisk", label: "Risk Onayla", implemented: true },
-	completeRisk: { key: "completeRisk", label: "Görev Tamamla", implemented: false },
+	completeRisk: { key: "completeRisk", label: "Görev Tamamla", implemented: true },
 }
 
 const ROLE_ACTIONS: Record<AuthUser["role"], RoleAction[]> = {
