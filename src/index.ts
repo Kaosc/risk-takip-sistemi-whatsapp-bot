@@ -1,39 +1,22 @@
 import { Client, LocalAuth } from "whatsapp-web.js"
 import qrcode from "qrcode-terminal"
-import * as fs from "fs"
 import * as dotenv from "dotenv"
 import { handleMessage } from "./message"
 
 dotenv.config()
 
-function findChromeExecutable(): string | undefined {
-	const candidates = [
-		process.env.CHROME_PATH,
-		"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-		"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
-		"C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe",
-		"C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
-	]
+const chromeExecutable = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
 
-	for (const candidate of candidates) {
-		if (candidate && fs.existsSync(candidate)) {
-			return candidate
-		}
-	}
-	return undefined
-}
-
-const chromeExecutable = findChromeExecutable()
 if (!chromeExecutable) {
-	console.warn("Chrome/Edge executable not found. Install Chrome or set CHROME_PATH env var.")
+	console.warn("Chrome/Edge executable not found.")
 }
 
 const client = new Client({
 	authStrategy: new LocalAuth(),
-	puppeteer: {
+	puppeteer: {	
 		headless: true,
 		args: ["--no-sandbox", "--disable-setuid-sandbox"],
-		...(chromeExecutable ? { executablePath: chromeExecutable } : {}),
+		executablePath: chromeExecutable,
 	},
 })
 
@@ -47,7 +30,7 @@ client.on("ready", () => {
 })
 
 client.on("message_create", async (message) => {
-	// !! HARD CODE ID OF THE CHAT AND SENDER ID OTHER WISE IT WILL AUTO RESPOND TO ALL AVAILABLE CHATS 
+	// !! HARD CODE ID OF THE CHAT AND SENDER ID OTHER WISE IT WILL AUTO RESPOND TO ALL AVAILABLE CHATS
 	const isSelfChat = message.from === process.env.MESSAGE_FROM && message.to === process.env.MESSAGE_TO
 	if (!message.fromMe || !isSelfChat) return
 

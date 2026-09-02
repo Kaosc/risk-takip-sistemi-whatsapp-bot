@@ -21,7 +21,7 @@ export function buildMenu(role: AuthUser["role"]): string {
 		return "Şu an için sizin için uygun bir işlem bulunmuyor. Yakında eklenecektir."
 	}
 	const lines = actions.map((action, i) => `${i + 1} - ${action.label}`)
-	return `İşlem seçiniz:\n${lines.join("\n")}`
+	return `İşlem seçiniz:\n\n${lines.join("\n")}`
 }
 
 export function matchSelection(role: AuthUser["role"], text: string): RoleAction | undefined {
